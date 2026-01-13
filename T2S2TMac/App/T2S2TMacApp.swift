@@ -22,6 +22,12 @@ struct T2S2TMacApp: App {
                         .environmentObject(llmService)
                         .frame(minWidth: 520, minHeight: 500)
                 }
+                // Global keyboard shortcut: Enter sends text from anywhere
+                .onKeyPress(.return) {
+                    // Post notification that will be handled by PracticeView
+                    NotificationCenter.default.post(name: NSNotification.Name("SendMessage"), object: nil)
+                    return .handled
+                }
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
@@ -90,6 +96,11 @@ struct PracticeView: View {
     @State private var currentLanguage = "English"
     @State private var isProcessing = false
     @State private var autoSpeak = true
+    @State private var hasPendingAutoSend = false  // True when text is ready for auto-send
+    @State private var wasEditedAfterRecognition = false  // True if user edited recognized text
+    
+    // Task to sync recognized text in real-time while recording
+    @State private var syncTask: Task<Void, Never>?
     
     var body: some View {
         HStack(spacing: 0) {
@@ -97,6 +108,10 @@ struct PracticeView: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Target Language")
                     .font(.headline)
+                
+                LanguageButton(name: "English", flag: "🇺🇸", isSelected: currentLanguage == "English") {
+                    currentLanguage = "English"
+                }
                 
                 LanguageButton(name: "Spanish", flag: "🇪🇸", isSelected: currentLanguage == "Spanish") {
                     currentLanguage = "Spanish"
@@ -116,6 +131,10 @@ struct PracticeView: View {
                 
                 LanguageButton(name: "Chinese", flag: "🇨🇳", isSelected: currentLanguage == "Chinese") {
                     currentLanguage = "Chinese"
+                }
+                
+                LanguageButton(name: "Esperanto", flag: "🌍", isSelected: currentLanguage == "Esperanto") {
+                    currentLanguage = "Esperanto"
                 }
                 
                 Spacer()
@@ -193,35 +212,44 @@ struct PracticeView: View {
                         .buttonStyle(.plain)
                         .help(isConversationMode ? "Stop conversation" : "Start speaking")
                         
-                        // Text input field for typing - ONLY show when NOT recording
-                        if !isConversationMode {
-                            TextField("Type your message...", text: $userInput)
-                                .textFieldStyle(.plain)
-                                .padding(10)
-                                .background(Color(NSColor.textBackgroundColor))
-                                .cornerRadius(8)
-                                .disabled(isProcessing)
-                            
-                            // Send button for typed input
-                            Button(action: sendMessage) {
-                                Image(systemName: "paperplane.fill")
-                                    .font(.title3)
-                                    .foregroundColor(userInput.isEmpty ? .gray : .blue)
+                        // Text input field - ALWAYS visible
+                        TextField("Type or speak here...", text: $userInput)
+                            .textFieldStyle(.plain)
+                            .padding(10)
+                            .background(Color(NSColor.textBackgroundColor))
+                            .cornerRadius(8)
+                            .disabled(isProcessing)
+                            .onSubmit {
+                                // Enter key sends the message
+                                if !userInput.isEmpty {
+                                    sendMessage()
+                                }
                             }
-                            .buttonStyle(.plain)
-                            .disabled(userInput.isEmpty || isProcessing)
+                            .onChange(of: userInput) { _, newValue in
+                                // If user edits text that was recognized from speech,
+                                // disable auto-send and require manual send
+                                if hasPendingAutoSend && isConversationMode {
+                                    let wasRecognized = speechService.recognizedText
+                                    // Check if the new value differs from what was recognized
+                                    // (allowing for minor edits)
+                                    if newValue != wasRecognized {
+                                        wasEditedAfterRecognition = true
+                                        hasPendingAutoSend = false
+                                        print("[UI] User started editing recognized text - auto-send disabled")
+                                    }
+                                }
+                            }
+                        
+                        // Send button - ALWAYS visible
+                        Button(action: sendMessage) {
+                            Image(systemName: "paperplane.fill")
+                                .font(.title3)
+                                .foregroundColor(userInput.isEmpty ? .gray : .blue)
                         }
+                        .buttonStyle(.plain)
+                        .disabled(userInput.isEmpty || isProcessing)
                         
                         Spacer()
-                        
-                        // Auto Speak toggle (for TTS responses) - only show when not recording
-                        if !isConversationMode {
-                            Toggle("Auto Speak", isOn: $autoSpeak)
-                                .font(.caption)
-                                .toggleStyle(.switch)
-                                .controlSize(.small)
-                                .disabled(isProcessing)
-                        }
                     }
                     
                     // Status and audio level display
@@ -248,11 +276,30 @@ struct PracticeView: View {
                         
                         // Show recognized text while recording
                         if isConversationMode && !speechService.recognizedText.isEmpty {
-                            Text("• \(speechService.recognizedText)")
-                                .font(.caption)
+                            HStack(spacing: 4) {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 6, height: 6)
+                                Text(speechService.recognizedText)
+                                    .font(.caption)
+                                    .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                        }
+                        
+                        // Show auto-send indicator
+                        if hasPendingAutoSend {
+                            Text("• Will auto-send after silence")
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
+                        
+                        // Show edit indicator
+                        if wasEditedAfterRecognition {
+                            Text("• Edit detected - click Send to send")
+                                .font(.caption2)
                                 .foregroundColor(.blue)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
                         }
                         
                         Spacer()
@@ -335,6 +382,20 @@ struct PracticeView: View {
             // Stop the conversation
             stopConversation()
         } else {
+            // Check if speech recognizer is available for this language
+            guard speechService.recognizerAvailable else {
+                // Show fallback message for unsupported languages
+                let fallbackMessage = """
+                Speech recognition is not supported for \(currentLanguage) on this Mac.
+                
+                Please type your message below and press Enter or click Send.
+                
+                Note: The AI can still understand and respond in \(currentLanguage).
+                """
+                conversation.append(ChatMessage(id: UUID(), role: .assistant, content: fallbackMessage))
+                return
+            }
+            
             // Start a new conversation
             startConversation()
         }
@@ -351,21 +412,32 @@ struct PracticeView: View {
         // Set up silence detection callback
         speechService.onSilenceDetected = { [self] in
             guard isConversationMode else { return }
-            print("[UI] Silence detected, stopping recording and sending to AI...")
+            print("[UI] ════════════════════════════════════════════════════════════")
+            print("[UI] SILENCE DETECTED - processing recognized text...")
+            print("[UI] Recognized text: '\(speechService.recognizedText)'")
             
             // Stop recording but keep conversation mode active
-            let finalText = speechService.recognizedText
             speechService.stopRecording()
             
-            // Send to AI if we have text
-            if !finalText.isEmpty {
-                sendToAI(text: finalText)
+            // Sync recognized text to userInput
+            if !speechService.recognizedText.isEmpty {
+                userInput = speechService.recognizedText
+                print("[UI] Text synced to input area")
+                
+                // Check if user has started editing (disable auto-send)
+                wasEditedAfterRecognition = false
+                hasPendingAutoSend = true
+                
+                // Auto-send recognized text (user can still click Send if not satisfied)
+                print("[UI] AUTO-SENDING recognized text to AI...")
+                print("[UI] Note: If you edit the text, auto-send will be disabled")
+                sendToAI(text: userInput)
+                userInput = ""
+                hasPendingAutoSend = false
             } else {
-                // No text recognized, restart listening
-                DispatchQueue.main.async {
-                    startListening()
-                }
+                print("[UI] No text recognized - waiting for user input")
             }
+            print("[UI] ════════════════════════════════════════════════════════════")
         }
         
         // Start listening - will auto-stop after 2.5s silence
@@ -375,6 +447,18 @@ struct PracticeView: View {
     private func stopConversation() {
         print("[UI] Stopping conversation mode")
         isConversationMode = false
+        hasPendingAutoSend = false
+        wasEditedAfterRecognition = false
+        
+        // Cancel sync task if running
+        syncTask?.cancel()
+        syncTask = nil
+        
+        // Sync recognized text to userInput so user can edit and send
+        if !speechService.recognizedText.isEmpty {
+            userInput = speechService.recognizedText
+            print("[UI] Synced recognized text to input: '\(speechService.recognizedText)'")
+        }
         
         // Disable streaming
         speechService.isAutoMode = false
@@ -388,19 +472,46 @@ struct PracticeView: View {
         
         Task { @MainActor in
             do {
-                print("[UI] Starting to listen...")
+                print("[UI] Starting to listen for \(currentLanguage)...")
                 speechService.recognizedText = ""
+                userInput = ""
                 try speechService.startRecording(languageCode: languageCode(currentLanguage))
-            } catch {
-                print("[UI] Failed to start listening: \(error)")
-                // Show user-friendly error in conversation
-                let errorMessage = getUserFriendlyErrorMessage(for: error)
-                conversation.append(ChatMessage(id: UUID(), role: .assistant, content: errorMessage))
-                // Try to restart after a short delay (only if still in conversation mode)
-                if isConversationMode {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        self.startListening()
+                
+                // Start real-time sync of recognized text to userInput
+                self.syncTask = Task { @MainActor [self] in
+                    while !Task.isCancelled && self.isConversationMode {
+                        // Sync recognized text to userInput as it comes in
+                        if !self.speechService.recognizedText.isEmpty {
+                            self.userInput = self.speechService.recognizedText
+                        }
+                        try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
                     }
+                }
+            } catch {
+                print("[UI] Speech recognition failed: \(error)")
+                
+                // Check if it's a recognizer not available error
+                if let speechError = error as? SpeechService.SpeechError,
+                   case .recognizerNotAvailable = speechError {
+                    // Show fallback message for unsupported languages
+                    let fallbackMessage = """
+                    Speech recognition is not supported for \(currentLanguage) on this Mac.
+                    
+                    Please type your message below and press Enter or click Send.
+                    
+                    Note: The AI can still understand and respond in \(currentLanguage).
+                    """
+                    conversation.append(ChatMessage(id: UUID(), role: .assistant, content: fallbackMessage))
+                    
+                    // Exit conversation mode so user can type
+                    isConversationMode = false
+                    // Stop any pending auto-send state
+                    hasPendingAutoSend = false
+                    wasEditedAfterRecognition = false
+                } else {
+                    // Show generic error message
+                    let errorMessage = getUserFriendlyErrorMessage(for: error)
+                    conversation.append(ChatMessage(id: UUID(), role: .assistant, content: errorMessage))
                 }
             }
         }
@@ -444,7 +555,16 @@ struct PracticeView: View {
     }
     
     private func sendToAI(text: String) {
-        guard !text.isEmpty else { return }
+        guard !text.isEmpty else {
+            print("[UI] sendToAI called with empty text - ignoring")
+            return
+        }
+        
+        print("[UI] ════════════════════════════════════════════════════════════")
+        print("[UI] SENDING TO AI:")
+        print("[UI] Text: '\(text)'")
+        print("[UI] Language: \(currentLanguage)")
+        print("[UI] ════════════════════════════════════════════════════════════")
         
         isProcessing = true
         
@@ -498,7 +618,26 @@ struct PracticeView: View {
     }
     
     private func sendMessage() {
-        guard !userInput.isEmpty else { return }
+        guard !userInput.isEmpty else {
+            print("[UI] sendMessage called with empty userInput - ignoring")
+            return
+        }
+        
+        // Determine if this is recognized speech or typed text
+        let isRecognizedSpeech = hasPendingAutoSend && !wasEditedAfterRecognition
+        
+        print("[UI] ════════════════════════════════════════════════════════════")
+        if isRecognizedSpeech {
+            print("[UI] Sending recognized text (user clicked Send): '\(userInput)'")
+        } else {
+            print("[UI] Sending typed text: '\(userInput)'")
+        }
+        print("[UI] ════════════════════════════════════════════════════════════")
+        
+        // Clear auto-send state
+        hasPendingAutoSend = false
+        wasEditedAfterRecognition = false
+        
         sendToAI(text: userInput)
         userInput = ""
     }
@@ -510,6 +649,7 @@ struct PracticeView: View {
         case "German": return "de-DE"
         case "Japanese": return "ja-JP"
         case "Chinese": return "zh-CN"
+        case "Esperanto": return "eo"  // Esperanto locale
         default: return "en-US"
         }
     }

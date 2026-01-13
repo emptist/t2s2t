@@ -32,7 +32,7 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
     
     // MARK: - VAD Configuration (Audio Energy-Based)
     private let vadSilenceThreshold: Float = 0.01  // RMS threshold for silence (very quiet)
-    private let vadSilenceDuration: TimeInterval = 2.5  // Stop after 2.5s of silence
+    private let vadSilenceDuration: TimeInterval = 1.5  // Stop after 1.5s of silence
     private let vadCheckInterval: TimeInterval = 0.1  // Check every 100ms
     
     // MARK: - VAD State
@@ -153,7 +153,9 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
     
     func startRecording(languageCode: String = "en-US") throws {
         print("[SpeechService] === startRecording called with languageCode: \(languageCode) ===")
+        // Clear error message at start - this is crucial to avoid showing stale errors
         errorMessage = nil
+        debugStatus = "Initializing..."
         
         // Check authorization status
         guard speechAuthorized else {
@@ -189,8 +191,12 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
         
         print("[SpeechService] Speech recognizer is available")
         
-        // Cancel previous task if running
-        stopRecording()
+        // Stop any existing recording first with proper cleanup
+        if isRecording {
+            stopRecording()
+            // Small delay to ensure complete cleanup
+            Thread.sleep(forTimeInterval: 0.2)
+        }
         
         // Create a fresh audio engine
         let engine = AVAudioEngine()
@@ -230,10 +236,7 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
             }
         }
         
-        // Start audio engine
-        engine.prepare()
-        
-        // Try to start engine with retry logic
+        // Start audio engine with retry logic
         var startError: Error?
         for attempt in 1...3 {
             do {
@@ -247,8 +250,8 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
                 if attempt < 3 {
                     Thread.sleep(forTimeInterval: 0.5)
                     engine.stop()
-                    let newEngine = AVAudioEngine()
-                    self.audioEngine = newEngine
+                    // Remove old tap and reinstall
+                    inputNode.removeTap(onBus: 0)
                     inputNode.installTap(onBus: 0, bufferSize: 4096, format: recordingFormat) { [weak self] buffer, _ in
                         guard let self = self, let request = self.recognitionRequest else { return }
                         request.append(buffer)
@@ -257,7 +260,7 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
                             self.audioLevel = level
                         }
                     }
-                    newEngine.prepare()
+                    engine.prepare()
                 }
             }
         }
@@ -290,9 +293,11 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
                 
                 // Check for common error codes that should be ignored
                 // 216: No speech detected (user hasn't spoken yet)
-                // 301: Recognition request was canceled (e.g., by VAD auto-stop)
+                // 301: Recognition request was canceled (e.g., by VAD auto-stop, or stopRecording called)
                 if error.code == 216 || error.code == 301 {
-                    print("[SpeechService] Ignoring expected error code \(error.code)")
+                    print("[SpeechService] Ignoring expected error code \(error.code) - this is normal when stopping recording")
+                    // Clear any stale error message that might have been set
+                    self.errorMessage = nil
                     return
                 }
                 
@@ -335,7 +340,8 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
         // Stop VAD timer
         stopVADTimer()
         
-        // Stop recognition task
+        // Stop recognition task - this may trigger error callback with code 301
+        // which is expected and should be ignored
         if let task = recognitionTask {
             task.cancel()
             recognitionTask = nil
@@ -357,6 +363,11 @@ class SpeechService: NSObject, ObservableObject, SFSpeechRecognizerDelegate, @un
         isRecording = false
         debugStatus = "Ready"
         audioLevel = 0.0
+        
+        // Clear error message when stopping - this prevents stale errors from showing
+        // The recognition task cancellation (code 301) may set errorMessage in the callback,
+        // so we clear it here to ensure clean state
+        errorMessage = nil
         
         print("[SpeechService] Recording stopped, recognized text: '\(recognizedText)'")
     }
