@@ -1,0 +1,72 @@
+# SwiftLint Configuration for T2S2T
+# Based on Apple's Swift API Design Guidelines
+
+disabled_rules:
+  - line_length
+  - function_body_length
+  - type_body_length
+  - file_length
+  - nesting
+  - identifier_name
+  - cyclomatic_complexity
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - prohibited_super_call
+  - redundant_nil_coalescing
+  - closure_spacing
+  - overridden_super_call
+  - redundant_objc_attribute
+  - private_outlet
+  - private_action
+  - yoda_condition
+
+included:
+  - T2S2T
+  - T2S2TMac
+  - T2S2TWatch
+  - Shared
+
+excluded:
+  - Carthage
+  - Pods
+  - T2S2T.xcodeproj
+  - T2S2T.xcworkspace
+  - build
+  - DerivedData
+
+line_length: 150
+function_body_length: 50
+type_body_length: 300
+file_length: 500
+
+cyclomatic_complexity: 15
+
+reporter: "xcode"
+
+custom_rules:
+  double_space:
+    included: ".*\\.swift"
+    name: "Double Space"
+    regex: "([a-zA-Z0-9])\\s{2,}([a-zA-Z0-9])"
+    message: "Double spaces are not allowed"
+    severity: warning
+
+  force_try:
+    name: "Force Try"
+    regex: "(!)"
+    message: "Force try should be avoided"
+    severity: warning
+    match_kinds:
+      - keyword
+
+  force_cast:
+    name: "Force Cast"
+    regex: "as!"
+    message: "Force cast should be avoided"
+    severity: warning
+    match_kinds:
+      - keyword

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="true" userDefinedModelVersionIdentifier="">
+    <entity name="UserProfile" representedClassName="UserProfile" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nativeLanguage" optional="YES" attributeType="String"/>
+        <attribute name="proficiencyLevel" optional="YES" attributeType="String"/>
+        <attribute name="targetLanguage" optional="YES" attributeType="String"/>
+        <relationship name="conversations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Conversation" inverseName="user" inverseEntity="Conversation"/>
+        <relationship name="progressEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProgressEntry" inverseName="user" inverseEntity="ProgressEntry"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Conversation" representedClassName="Conversation" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID"/>
+        <attribute name="language" optional="YES" attributeType="String"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="topic" optional="YES" attributeType="String"/>
+        <attribute name="transcript" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="feedbackSummary" optional="YES" attributeType="String"/>
+        <attribute name="fluencyScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserProfile" inverseName="conversations" inverseEntity="UserProfile"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="ProgressEntry" representedClassName="ProgressEntry" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="fluencyScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="grammarScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID"/>
+        <attribute name="vocabularyScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalPracticeMinutes" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserProfile" inverseName="progressEntries" inverseEntity="UserProfile"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <elements>
+        <element name="UserProfile" positionX="-72" positionY="-18" width="128" height="178"/>
+        <element name="Conversation" positionX="180" positionY="-90" width="128" height="246"/>
+        <element name="ProgressEntry" positionX="180" positionY="180" width="128" height="178"/>
+    </elements>
+</model>
