@@ -1,15 +1,19 @@
 #!/bin/bash
 # Build script for T2S2T project
-# Usage: ./build_scripts/build.sh [command]
+# Usage: ./T2S2T/build_scripts/build.sh [command]
 # Commands: build, test, archive, clean, lint
 
 set -e
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="$( cd "$SCRIPT_DIR/../.." && pwd )"
 
 PROJECT_NAME="T2S2T"
 SCHEME="T2S2T"
 CONFIGURATION="Release"
 DESTINATION="platform=iOS Simulator,name=iPhone 15 Pro"
-PROJECT_PATH="../T2S2T.xcodeproj"
+PROJECT_PATH="$ROOT_DIR/T2S2T.xcodeproj"
 
 case "$1" in
     build)

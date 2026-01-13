@@ -1,0 +1,685 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0868E70E01E914FC223D4255 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4135889EE4DA0C0EB2ED6CC1 /* Assets.xcassets */; };
+		0A294BDAA125D04AEBF9E336 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FE2145EE440BF535D02E8C /* Configuration.swift */; };
+		16952FAC773421893385166A /* T2S2T.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 44BA716B6315D42D570A2CF4 /* T2S2T.xcdatamodeld */; };
+		19A2D60028395F2A8005736D /* Conversation+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658FB12BC04EC4796449D36C /* Conversation+CoreData.swift */; };
+		237099C5CAF0ABCC80000DC4 /* UserProfile+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBA6A20CF8A69BD9771B4E /* UserProfile+CoreData.swift */; };
+		2C1D040B10737F789F768386 /* T2S2TMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25ED6B4856866E3B513D47E0 /* T2S2TMacApp.swift */; };
+		3750B9D2599D0A42574879FD /* Conversation+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658FB12BC04EC4796449D36C /* Conversation+CoreData.swift */; };
+		41243DDF309AE3EAA284AD95 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4E2B390D3AF4E438B84638 /* SpeechService.swift */; };
+		506282ADB6619C9A182191E2 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FE2145EE440BF535D02E8C /* Configuration.swift */; };
+		54DD005593246B15B443EA77 /* Conversation+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658FB12BC04EC4796449D36C /* Conversation+CoreData.swift */; };
+		58B453B3D80D95CCCC94342F /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4E2B390D3AF4E438B84638 /* SpeechService.swift */; };
+		7171897D1B90ABDC7AE5CDF4 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4E2B390D3AF4E438B84638 /* SpeechService.swift */; };
+		73D8F3992D2F00604974A896 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AD6482530576A76E0A9917 /* DataController.swift */; };
+		7863FAC7F83A1669604983BA /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9492AF15428EBD3301920262 /* LLMService.swift */; };
+		7AAD86A7BCDFA14F9FE30076 /* ProgressEntry+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BEB3ECDBE4FD70771ACF02 /* ProgressEntry+CoreData.swift */; };
+		8B5F718CA56239573D6FAD1C /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FE2145EE440BF535D02E8C /* Configuration.swift */; };
+		971464C1A314AF3BEAE5FD94 /* T2S2T.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 44BA716B6315D42D570A2CF4 /* T2S2T.xcdatamodeld */; };
+		9DE04D309FF56A88271A5AB9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ED7EE5D009781016BD5C15A7 /* README.md */; };
+		A314C9ABB5306682B87A5AB7 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9492AF15428EBD3301920262 /* LLMService.swift */; };
+		A640223C97CB4CA721BE9525 /* UserProfile+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBA6A20CF8A69BD9771B4E /* UserProfile+CoreData.swift */; };
+		B47B2145B51E25DAAF4A1A86 /* T2S2TApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978B135AF3366AE80D480A3E /* T2S2TApp.swift */; };
+		B575C68F4A4729EA34B01F10 /* UserProfile+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBA6A20CF8A69BD9771B4E /* UserProfile+CoreData.swift */; };
+		BE2DB83C504170EFFD03A4DE /* T2S2T.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 44BA716B6315D42D570A2CF4 /* T2S2T.xcdatamodeld */; };
+		C50CF08B7CAF2DC24AA16487 /* IOS_CONFIGURATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 1CB0F33B7B56F20A5B54AC77 /* IOS_CONFIGURATION_GUIDE.md */; };
+		CA29DE23A688D0E3B341DF07 /* ProgressEntry+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BEB3ECDBE4FD70771ACF02 /* ProgressEntry+CoreData.swift */; };
+		CC4FB66BC8B6B1566DE320AD /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 3D60ADD8C6EAB4C84B73D23F /* build.sh */; };
+		D6FA1158F92EDC965235C889 /* ProgressEntry+CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BEB3ECDBE4FD70771ACF02 /* ProgressEntry+CoreData.swift */; };
+		E61EE9E86F6F378C1C05DE12 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AD6482530576A76E0A9917 /* DataController.swift */; };
+		E699F470E47E6EC29072104D /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9492AF15428EBD3301920262 /* LLMService.swift */; };
+		EA5555951FC5C82B04CFFD10 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AD6482530576A76E0A9917 /* DataController.swift */; };
+		F4A59E4EA4C6E8DDDB82865A /* T2S2TWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2585F705C32EED3E448E2913 /* T2S2TWatchApp.swift */; };
+		F558C9013245B15D43E5F4C5 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146825B76CF8B145C451F012 /* ConversationView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		06A23575704A6A56B4A320FC /* T2S2T.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = T2S2T.entitlements; sourceTree = "<group>"; };
+		0E4E2B390D3AF4E438B84638 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		146825B76CF8B145C451F012 /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
+		1CB0F33B7B56F20A5B54AC77 /* IOS_CONFIGURATION_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = IOS_CONFIGURATION_GUIDE.md; sourceTree = "<group>"; };
+		2585F705C32EED3E448E2913 /* T2S2TWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = T2S2TWatchApp.swift; sourceTree = "<group>"; };
+		25AD6482530576A76E0A9917 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		25ED6B4856866E3B513D47E0 /* T2S2TMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = T2S2TMacApp.swift; sourceTree = "<group>"; };
+		262ED4BAA73910528024C52C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3D60ADD8C6EAB4C84B73D23F /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		4135889EE4DA0C0EB2ED6CC1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4645D57DADE67272A93F6130 /* T2S2TWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = T2S2TWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DFBA6A20CF8A69BD9771B4E /* UserProfile+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserProfile+CoreData.swift"; sourceTree = "<group>"; };
+		5E76507061EADFA9F1C40239 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6004E701F4F95F48B6BD8EB1 /* T2S2T.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = T2S2T.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		658FB12BC04EC4796449D36C /* Conversation+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Conversation+CoreData.swift"; sourceTree = "<group>"; };
+		74BEB3ECDBE4FD70771ACF02 /* ProgressEntry+CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProgressEntry+CoreData.swift"; sourceTree = "<group>"; };
+		9492AF15428EBD3301920262 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
+		978B135AF3366AE80D480A3E /* T2S2TApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = T2S2TApp.swift; sourceTree = "<group>"; };
+		9E69A1DF01E210B069DF40E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B30D74B8219B88E5A813A9FB /* T2S2TMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = T2S2TMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E625443462824B8034F94847 /* T2S2TMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = T2S2TMac.entitlements; sourceTree = "<group>"; };
+		ED7EE5D009781016BD5C15A7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F9FE2145EE440BF535D02E8C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		092230BEAC2681CB12636359 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				978B135AF3366AE80D480A3E /* T2S2TApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		186D5812EE4DE0562185AB8F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				2585F705C32EED3E448E2913 /* T2S2TWatchApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		1A3EBB12321CDD0319D3D722 /* build_scripts */ = {
+			isa = PBXGroup;
+			children = (
+				3D60ADD8C6EAB4C84B73D23F /* build.sh */,
+				ED7EE5D009781016BD5C15A7 /* README.md */,
+			);
+			path = build_scripts;
+			sourceTree = "<group>";
+		};
+		1F696A7D2FFE5A9B43B17091 /* T2S2TWatch */ = {
+			isa = PBXGroup;
+			children = (
+				5E76507061EADFA9F1C40239 /* Info.plist */,
+				186D5812EE4DE0562185AB8F /* App */,
+			);
+			path = T2S2TWatch;
+			sourceTree = "<group>";
+		};
+		572A204B2B0A3F23D04AA713 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D6B9BA6001D5F1AE61EEE2D8 /* Models */,
+				84AC0541CC313C1FD38261C9 /* Services */,
+				D94359A347BA8F4E2C0B1F2C /* Utilities */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		66F8EAABBF1F5AE793A86799 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				146825B76CF8B145C451F012 /* ConversationView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		721BC9BE4DDEBC69E377F021 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				25ED6B4856866E3B513D47E0 /* T2S2TMacApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		83C5F09A75DAFEF0575146BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6004E701F4F95F48B6BD8EB1 /* T2S2T.app */,
+				B30D74B8219B88E5A813A9FB /* T2S2TMac.app */,
+				4645D57DADE67272A93F6130 /* T2S2TWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		84AC0541CC313C1FD38261C9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9492AF15428EBD3301920262 /* LLMService.swift */,
+				0E4E2B390D3AF4E438B84638 /* SpeechService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		97992BE608D4AE265A5D39D3 /* T2S2TMac */ = {
+			isa = PBXGroup;
+			children = (
+				9E69A1DF01E210B069DF40E3 /* Info.plist */,
+				E625443462824B8034F94847 /* T2S2TMac.entitlements */,
+				721BC9BE4DDEBC69E377F021 /* App */,
+			);
+			path = T2S2TMac;
+			sourceTree = "<group>";
+		};
+		CEE888581C784D585ED836EB = {
+			isa = PBXGroup;
+			children = (
+				572A204B2B0A3F23D04AA713 /* Shared */,
+				E710A346D43F306052AC43EF /* T2S2T */,
+				97992BE608D4AE265A5D39D3 /* T2S2TMac */,
+				1F696A7D2FFE5A9B43B17091 /* T2S2TWatch */,
+				83C5F09A75DAFEF0575146BD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D6B9BA6001D5F1AE61EEE2D8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				658FB12BC04EC4796449D36C /* Conversation+CoreData.swift */,
+				25AD6482530576A76E0A9917 /* DataController.swift */,
+				74BEB3ECDBE4FD70771ACF02 /* ProgressEntry+CoreData.swift */,
+				44BA716B6315D42D570A2CF4 /* T2S2T.xcdatamodeld */,
+				4DFBA6A20CF8A69BD9771B4E /* UserProfile+CoreData.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D94359A347BA8F4E2C0B1F2C /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F9FE2145EE440BF535D02E8C /* Configuration.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		E710A346D43F306052AC43EF /* T2S2T */ = {
+			isa = PBXGroup;
+			children = (
+				4135889EE4DA0C0EB2ED6CC1 /* Assets.xcassets */,
+				262ED4BAA73910528024C52C /* Info.plist */,
+				1CB0F33B7B56F20A5B54AC77 /* IOS_CONFIGURATION_GUIDE.md */,
+				06A23575704A6A56B4A320FC /* T2S2T.entitlements */,
+				092230BEAC2681CB12636359 /* App */,
+				1A3EBB12321CDD0319D3D722 /* build_scripts */,
+				66F8EAABBF1F5AE793A86799 /* Views */,
+			);
+			path = T2S2T;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		18CB1FEA71F7A67B49BA3E08 /* T2S2TMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A0CB00B1B95A17C0DCD6CC8 /* Build configuration list for PBXNativeTarget "T2S2TMac" */;
+			buildPhases = (
+				95075E12A7E74C424E8EBEF5 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = T2S2TMac;
+			packageProductDependencies = (
+			);
+			productName = T2S2TMac;
+			productReference = B30D74B8219B88E5A813A9FB /* T2S2TMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B370799F39F504E7BCD3D9E9 /* T2S2TWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9DD83D22251201DD3EEC4D56 /* Build configuration list for PBXNativeTarget "T2S2TWatch" */;
+			buildPhases = (
+				949DE424717FDC453B1D78DC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = T2S2TWatch;
+			packageProductDependencies = (
+			);
+			productName = T2S2TWatch;
+			productReference = 4645D57DADE67272A93F6130 /* T2S2TWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CD95F708F6FC2D34DAC409AA /* T2S2T */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6643AFF7BD2310B44DF9ECF /* Build configuration list for PBXNativeTarget "T2S2T" */;
+			buildPhases = (
+				F66710BE5B4196A297248F9C /* Sources */,
+				9D45EAC589380BD7FE99E14B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = T2S2T;
+			packageProductDependencies = (
+			);
+			productName = T2S2T;
+			productReference = 6004E701F4F95F48B6BD8EB1 /* T2S2T.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D03BB00D0CB981379D04CFB6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					18CB1FEA71F7A67B49BA3E08 = {
+						ProvisioningStyle = Automatic;
+					};
+					B370799F39F504E7BCD3D9E9 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					CD95F708F6FC2D34DAC409AA = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 87BDAB9AB97A8CA93B82A0B3 /* Build configuration list for PBXProject "T2S2T" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CEE888581C784D585ED836EB;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD95F708F6FC2D34DAC409AA /* T2S2T */,
+				18CB1FEA71F7A67B49BA3E08 /* T2S2TMac */,
+				B370799F39F504E7BCD3D9E9 /* T2S2TWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9D45EAC589380BD7FE99E14B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0868E70E01E914FC223D4255 /* Assets.xcassets in Resources */,
+				C50CF08B7CAF2DC24AA16487 /* IOS_CONFIGURATION_GUIDE.md in Resources */,
+				9DE04D309FF56A88271A5AB9 /* README.md in Resources */,
+				CC4FB66BC8B6B1566DE320AD /* build.sh in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		949DE424717FDC453B1D78DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				506282ADB6619C9A182191E2 /* Configuration.swift in Sources */,
+				54DD005593246B15B443EA77 /* Conversation+CoreData.swift in Sources */,
+				E61EE9E86F6F378C1C05DE12 /* DataController.swift in Sources */,
+				A314C9ABB5306682B87A5AB7 /* LLMService.swift in Sources */,
+				CA29DE23A688D0E3B341DF07 /* ProgressEntry+CoreData.swift in Sources */,
+				7171897D1B90ABDC7AE5CDF4 /* SpeechService.swift in Sources */,
+				BE2DB83C504170EFFD03A4DE /* T2S2T.xcdatamodeld in Sources */,
+				F4A59E4EA4C6E8DDDB82865A /* T2S2TWatchApp.swift in Sources */,
+				B575C68F4A4729EA34B01F10 /* UserProfile+CoreData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95075E12A7E74C424E8EBEF5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A294BDAA125D04AEBF9E336 /* Configuration.swift in Sources */,
+				19A2D60028395F2A8005736D /* Conversation+CoreData.swift in Sources */,
+				73D8F3992D2F00604974A896 /* DataController.swift in Sources */,
+				E699F470E47E6EC29072104D /* LLMService.swift in Sources */,
+				7AAD86A7BCDFA14F9FE30076 /* ProgressEntry+CoreData.swift in Sources */,
+				58B453B3D80D95CCCC94342F /* SpeechService.swift in Sources */,
+				971464C1A314AF3BEAE5FD94 /* T2S2T.xcdatamodeld in Sources */,
+				2C1D040B10737F789F768386 /* T2S2TMacApp.swift in Sources */,
+				A640223C97CB4CA721BE9525 /* UserProfile+CoreData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F66710BE5B4196A297248F9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B5F718CA56239573D6FAD1C /* Configuration.swift in Sources */,
+				3750B9D2599D0A42574879FD /* Conversation+CoreData.swift in Sources */,
+				F558C9013245B15D43E5F4C5 /* ConversationView.swift in Sources */,
+				EA5555951FC5C82B04CFFD10 /* DataController.swift in Sources */,
+				7863FAC7F83A1669604983BA /* LLMService.swift in Sources */,
+				D6FA1158F92EDC965235C889 /* ProgressEntry+CoreData.swift in Sources */,
+				41243DDF309AE3EAA284AD95 /* SpeechService.swift in Sources */,
+				16952FAC773421893385166A /* T2S2T.xcdatamodeld in Sources */,
+				B47B2145B51E25DAAF4A1A86 /* T2S2TApp.swift in Sources */,
+				237099C5CAF0ABCC80000DC4 /* UserProfile+CoreData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0C1F72856E79D64E83FFD960 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = T2S2TMac/T2S2TMac.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 974M85JNL5;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				INFOPLIST_FILE = T2S2TMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.emptist.t2s2t;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		2A42B94932E1F0F01F276D1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = T2S2TWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.t2s2t.app.watch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		69B11EBCF4FA6F88C5849DBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		A99E14AE3C580B934F45F704 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = T2S2TWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.t2s2t.app.watch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		AC03EDD938D913AF3E1DE9D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = T2S2T/T2S2T.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = T2S2T/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.t2s2t.app;
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B31CB0D1DB082487C5C9FC9D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = T2S2TMac/T2S2TMac.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 974M85JNL5;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				INFOPLIST_FILE = T2S2TMac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.emptist.t2s2t;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E45761439708A12B9601DFC8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		F19B2D7312F16A7D41426E92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = T2S2T/T2S2T.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = T2S2T/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.t2s2t.app;
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2A0CB00B1B95A17C0DCD6CC8 /* Build configuration list for PBXNativeTarget "T2S2TMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C1F72856E79D64E83FFD960 /* Debug */,
+				B31CB0D1DB082487C5C9FC9D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		87BDAB9AB97A8CA93B82A0B3 /* Build configuration list for PBXProject "T2S2T" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E45761439708A12B9601DFC8 /* Debug */,
+				69B11EBCF4FA6F88C5849DBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9DD83D22251201DD3EEC4D56 /* Build configuration list for PBXNativeTarget "T2S2TWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A99E14AE3C580B934F45F704 /* Debug */,
+				2A42B94932E1F0F01F276D1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B6643AFF7BD2310B44DF9ECF /* Build configuration list for PBXNativeTarget "T2S2T" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F19B2D7312F16A7D41426E92 /* Debug */,
+				AC03EDD938D913AF3E1DE9D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		44BA716B6315D42D570A2CF4 /* T2S2T.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+			);
+			path = T2S2T.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = D03BB00D0CB981379D04CFB6 /* Project object */;
+}

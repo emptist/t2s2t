@@ -2,10 +2,10 @@ import CoreData
 import SwiftUI
 
 class DataController: ObservableObject {
-    let container: NSPersistentCloudKitContainer
+    let container: NSPersistentContainer
     
     init(inMemory: Bool = false) {
-        container = NSPersistentCloudKitContainer(name: "T2S2T")
+        container = NSPersistentContainer(name: "T2S2T")
         
         if inMemory {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
@@ -17,11 +17,12 @@ class DataController: ObservableObject {
             }
         }
         
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
     }
     
     // MARK: - Sample Data for Preview
+    @MainActor
     static var preview: DataController = {
         let controller = DataController(inMemory: true)
         let viewContext = controller.container.viewContext

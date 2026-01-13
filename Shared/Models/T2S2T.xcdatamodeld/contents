@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="true" userDefinedModelVersionIdentifier="">
-    <entity name="UserProfile" representedClassName="UserProfile" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="NO" userDefinedModelVersionIdentifier="">
+    <entity name="UserProfile" representedClassName="UserProfile" parentEntity="NSManagedObject" syncable="NO" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID"/>
         <attribute name="name" optional="YES" attributeType="String"/>
@@ -15,7 +15,7 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
-    <entity name="Conversation" representedClassName="Conversation" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+    <entity name="Conversation" representedClassName="Conversation" parentEntity="NSManagedObject" syncable="NO" codeGenerationType="class">
         <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID"/>
         <attribute name="language" optional="YES" attributeType="String"/>
@@ -31,7 +31,7 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
-    <entity name="ProgressEntry" representedClassName="ProgressEntry" parentEntity="NSManagedObject" syncable="true" codeGenerationType="class">
+    <entity name="ProgressEntry" representedClassName="ProgressEntry" parentEntity="NSManagedObject" syncable="NO" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fluencyScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="grammarScore" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

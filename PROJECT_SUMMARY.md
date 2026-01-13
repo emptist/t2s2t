@@ -40,38 +40,43 @@ The voice-first language training application has been successfully architected 
 ## Project Structure
 
 ```
-t2s2t/                               # ROOT FOLDER - Create Xcode project here
-├── T2S2T/                           # iOS app
-│   ├── App/T2S2TApp.swift           # Main app entry point
-│   ├── Views/ConversationView.swift # Main practice UI
+t2s2t/                                    # ROOT FOLDER
+├── project.yml                           # XcodeGen configuration
+├── setup_xcode_project.sh                # Project generation script
+├── T2S2T.xcodeproj/                      # Generated Xcode project
+├── T2S2T/                                # iOS app
+│   ├── App/T2S2TApp.swift                # Main app entry point
+│   ├── Views/ConversationView.swift      # Main practice UI
+│   ├── Info.plist                        # iOS app configuration
+│   ├── T2S2T.entitlements                # iOS capabilities
 │   └── build_scripts/
-├── T2S2TMac/                        # macOS app
-│   └── App/
-├── T2S2TWatch/                      # watchOS app
-│   └── App/
-├── Shared/                          # Shared code between all targets
+├── T2S2TMac/                             # macOS app
+│   ├── App/T2S2TMacApp.swift
+│   └── T2S2TMac.entitlements             # macOS capabilities
+├── T2S2TWatch/                           # watchOS app
+│   └── App/T2S2TWatchApp.swift
+├── Shared/                               # Shared code between all targets
 │   ├── Models/
-│   │   ├── DataController.swift     # Core Data controller
+│   │   ├── DataController.swift          # Core Data controller
 │   │   ├── UserProfile+CoreData.swift
 │   │   ├── Conversation+CoreData.swift
 │   │   ├── ProgressEntry+CoreData.swift
 │   │   └── T2S2T.xcdatamodeld/
 │   ├── Services/
-│   │   ├── SpeechService.swift      # Audio processing
-│   │   └── LLMService.swift         # AI integration
+│   │   ├── SpeechService.swift           # Audio processing
+│   │   └── LLMService.swift              # AI integration
 │   └── Utilities/
-│       └── Configuration.swift      # App configuration
-├── README.md                        # Project overview and setup
-├── PROJECT_SUMMARY.md               # This summary
-├── *.md                             # Documentation at root level
-│   ├── architecture_comparison.md   # Technology evaluation
-│   ├── technical_architecture.md    # Detailed architecture
-│   ├── swift_reevaluation.md        # Swift-specific analysis
-│   ├── beam_moonbit_analysis.md     # Alternative tech analysis
-│   ├── final_technology_recommendation.md # Decision rationale
-│   ├── QUICK_START.md               # Getting started guide
-│   ├── BUILD_TEST_GUIDE.md          # Build and test instructions
-│   └── planning to develop.md       # Original requirements
+│       └── Configuration.swift           # App configuration
+└── *.md                                  # Documentation at root level
+    ├── PROJECT_SUMMARY.md                # This summary
+    ├── swift_reevaluation.md             # Swift-specific analysis
+    ├── beam_moonbit_analysis.md          # Alternative tech analysis
+    ├── final_technology_recommendation.md # Decision rationale
+    ├── QUICK_START.md                    # Getting started guide
+    ├── BUILD_TEST_GUIDE.md               # Build and test instructions
+    ├── XCODE_WORKSPACE_GUIDE.md          # XcodeGen setup guide
+    ├── T2S2T/IOS_CONFIGURATION_GUIDE.md  # iOS target setup
+    └── planning to develop.md            # Original requirements
 ```
 
 ## Core Features Implemented
@@ -116,7 +121,7 @@ t2s2t/                               # ROOT FOLDER - Create Xcode project here
 
 ### **Phase 3: Platform Expansion** (Week 5-6)
 1. Create Apple Watch app with WatchKit
-2. Implement macOS Catalyst version
+2. Implement macOS native version
 3. Add iPadOS adaptive layout
 4. Implement Siri shortcuts
 
@@ -136,17 +141,19 @@ t2s2t/                               # ROOT FOLDER - Create Xcode project here
 
 ### **Build & Run**
 1. Clone repository
-2. Open in Xcode
-3. Configure signing certificates
-4. Set API keys in environment variables or Configuration.swift
-5. Build and run on simulator or device
+2. Run `./setup_xcode_project.sh` to generate Xcode project
+3. Open `T2S2T.xcodeproj` in Xcode
+4. Configure signing certificates
+5. Set API keys in environment variables or Configuration.swift
+6. Build and run on simulator or device
 
 ## Documentation Created
 
-1. **`architecture_comparison.md`** - Detailed comparison of all technology options
-2. **`swift_reevaluation.md`** - Swift-specific analysis and justification
-3. **`final_technology_recommendation.md`** - Final decision with rationale
-4. **`beam_moonbit_analysis.md`** - Evaluation of alternative preferred languages
+1. **`swift_reevaluation.md`** - Swift-specific analysis and justification
+2. **`final_technology_recommendation.md`** - Final decision with rationale
+3. **`beam_moonbit_analysis.md`** - Evaluation of alternative preferred languages
+4. **`XCODE_WORKSPACE_GUIDE.md`** - XcodeGen multi-platform workspace setup
+5. **`T2S2T/IOS_CONFIGURATION_GUIDE.md`** - iOS target configuration
 
 ## Success Criteria Met
 
@@ -156,6 +163,25 @@ t2s2t/                               # ROOT FOLDER - Create Xcode project here
 ✅ **Client-Side Only**: All data stays on device with optional sync
 ✅ **Cross-Device Sync**: Multiple sync channels implemented (iCloud, AirDrop, Email)
 ✅ **Pedagogical Approach**: Architecture supports subtle error correction
+
+## Getting Started
+
+### Quick Setup
+```bash
+cd /Users/jk/gits/hub/two_way_com_training/t2s2t
+./setup_xcode_project.sh
+```
+
+### Build Project
+```bash
+./T2S2T/build_scripts/build.sh build
+```
+
+### Documentation
+- `README.md` - Project overview and quick setup
+- `QUICK_START.md` - Detailed getting started guide
+- `BUILD_TEST_GUIDE.md` - Build and test instructions
+- `XCODE_WORKSPACE_GUIDE.md` - XcodeGen workflow
 
 ## Conclusion
 

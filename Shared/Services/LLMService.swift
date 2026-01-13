@@ -3,22 +3,78 @@ import Combine
 
 class LLMService: ObservableObject {
     private var apiKey: String = ""
-    private let baseURL = "https://api.openai.com/v1/chat/completions"
+    private var currentProvider: AIProviderType = .openAI
+    private var currentModel: String = ""
     
     private var urlSession: URLSession
     private var jsonDecoder: JSONDecoder
+    private var jsonEncoder: JSONEncoder
     
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var isConfigured = false
     
     init(urlSession: URLSession = .shared) {
         self.urlSession = urlSession
         self.jsonDecoder = JSONDecoder()
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        self.jsonEncoder = JSONEncoder()
+        self.jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
     }
     
-    func configure(apiKey: String) {
+    // MARK: - Configuration
+    
+    /// Configure with a specific provider
+    func configure(provider: AIProviderType, apiKey: String, model: String? = nil) {
+        self.currentProvider = provider
         self.apiKey = apiKey
+        self.currentModel = model ?? provider.defaultModel
+        self.isConfigured = true
+    }
+    
+    /// Configure using environment variables based on selected provider
+    func configureFromEnvironment() {
+        let provider = Configuration.selectedAIProvider
+        let apiKey = getAPIKey(for: provider)
+        let model = getModel(for: provider)
+        
+        if !apiKey.isEmpty {
+            configure(provider: provider, apiKey: apiKey, model: model)
+        }
+    }
+    
+    /// Get API key from environment for a specific provider
+    private func getAPIKey(for provider: AIProviderType) -> String {
+        switch provider {
+        case .openAI:
+            return Configuration.openAIAPIKey
+        case .anthropic:
+            return Configuration.anthropicAPIKey
+        case .qwen:
+            return Configuration.qwenAPIKey
+        }
+    }
+    
+    /// Get model name for a specific provider
+    private func getModel(for provider: AIProviderType) -> String {
+        switch provider {
+        case .openAI:
+            return "gpt-4-turbo-preview"
+        case .anthropic:
+            return "claude-3-opus-20240229"
+        case .qwen:
+            return Configuration.qwenModel
+        }
+    }
+    
+    /// Check if a provider is properly configured
+    func isProviderConfigured(_ provider: AIProviderType) -> Bool {
+        return !getAPIKey(for: provider).isEmpty
+    }
+    
+    /// Get the current provider's base URL
+    private var baseURL: String {
+        return currentProvider.baseURL
     }
     
     // MARK: - Public Methods
@@ -31,9 +87,9 @@ class LLMService: ObservableObject {
         Speak naturally and encouragingly.
         """
         
-        let messages = [
-            Message(role: "system", content: systemPrompt),
-            Message(role: "user", content: "Start a conversation with me in \(language)")
+        let messages: [[String: String]] = [
+            ["role": "system", "content": systemPrompt],
+            ["role": "user", "content": "Start a conversation with me in \(language)"]
         ]
         
         generateCompletion(messages: messages, completion: completion)
@@ -55,25 +111,19 @@ class LLMService: ObservableObject {
         5. Adjust difficulty based on user's apparent level
         """
         
-        let messages = [
-            Message(role: "system", content: systemPrompt),
-            Message(role: "user", content: userInput)
+        var messages: [[String: String]] = [
+            ["role": "system", "content": systemPrompt],
+            ["role": "user", "content": userInput]
         ]
         
         if !context.isEmpty {
-            // Include context from previous conversation
-            let contextMessage = Message(role: "assistant", content: context)
-            var allMessages = messages
-            allMessages.insert(contextMessage, at: 1)
-            generateCompletion(messages: allMessages, completion: completion)
-        } else {
-            generateCompletion(messages: messages, completion: completion)
+            messages.insert(["role": "assistant", "content": context], at: 1)
         }
+        
+        generateCompletion(messages: messages, completion: completion)
     }
     
     func analyzeErrors(userInput: String, targetLanguage: String, completion: @escaping (Result<ErrorAnalysis, Error>) -> Void) {
-        // This would call a more specialized endpoint for error analysis
-        // For now, return a simple analysis
         let analysis = ErrorAnalysis(
             hasErrors: false,
             errors: [],
@@ -85,7 +135,7 @@ class LLMService: ObservableObject {
     
     // MARK: - Private Methods
     
-    private func generateCompletion(messages: [Message], completion: @escaping (Result<String, Error>) -> Void) {
+    private func generateCompletion(messages: [[String: String]], completion: @escaping (Result<String, Error>) -> Void) {
         guard !apiKey.isEmpty else {
             completion(.failure(LLMError.missingAPIKey))
             return
@@ -94,20 +144,32 @@ class LLMService: ObservableObject {
         isLoading = true
         error = nil
         
-        let requestBody = ChatCompletionRequest(
-            model: "gpt-4-turbo-preview",
-            messages: messages,
-            temperature: 0.7,
-            maxTokens: 150
-        )
-        
         var request = URLRequest(url: URL(string: baseURL)!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        
+        // Set provider-specific headers
+        switch currentProvider {
+        case .openAI:
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        case .anthropic:
+            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+            request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+        case .qwen:
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
+        
+        // Build request body based on provider
+        let requestBody: Any
+        switch currentProvider {
+        case .openAI, .qwen:
+            requestBody = buildOpenAICompatibleRequest(messages: messages)
+        case .anthropic:
+            requestBody = buildAnthropicRequest(messages: messages)
+        }
         
         do {
-            request.httpBody = try JSONEncoder().encode(requestBody)
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
         } catch {
             isLoading = false
             completion(.failure(error))
@@ -130,8 +192,8 @@ class LLMService: ObservableObject {
                 }
                 
                 do {
-                    let completionResponse = try self?.jsonDecoder.decode(ChatCompletionResponse.self, from: data)
-                    if let content = completionResponse?.choices.first?.message.content {
+                    let content = try self?.parseResponse(data: data)
+                    if let content = content {
                         completion(.success(content))
                     } else {
                         completion(.failure(LLMError.invalidResponse))
@@ -146,38 +208,100 @@ class LLMService: ObservableObject {
         task.resume()
     }
     
+    private func buildOpenAICompatibleRequest(messages: [[String: String]]) -> [String: Any] {
+        return [
+            "model": currentModel,
+            "messages": messages,
+            "temperature": 0.7,
+            "max_tokens": 150
+        ]
+    }
+    
+    private func buildAnthropicRequest(messages: [[String: String]]) -> [String: Any] {
+        // Convert messages to Anthropic format
+        let systemMessage = messages.first { $0["role"] == "system" }
+        let conversationMessages = messages.filter { $0["role"] != "system" }
+        
+        var body: [String: Any] = [
+            "model": currentModel,
+            "max_tokens": 150,
+            "temperature": 0.7
+        ]
+        
+        if let system = systemMessage {
+            body["system"] = system["content"] ?? ""
+        }
+        
+        body["messages"] = conversationMessages.map { msg -> [String: String] in
+            var result: [String: String] = [:]
+            if let role = msg["role"] {
+                // Map user/assistant roles for Anthropic
+                result["role"] = role == "assistant" ? "assistant" : "user"
+            }
+            if let content = msg["content"] {
+                result["content"] = content
+            }
+            return result
+        }
+        
+        return body
+    }
+    
+    private func parseResponse(data: Data) throws -> String {
+        switch currentProvider {
+        case .openAI, .qwen:
+            let response = try jsonDecoder.decode(ChatCompletionResponse.self, from: data)
+            if let content = response.choices.first?.message.content {
+                return content
+            }
+            throw LLMError.invalidResponse
+            
+        case .anthropic:
+            let response = try jsonDecoder.decode(AnthropicResponse.self, from: data)
+            if let content = response.content.first?.text {
+                return content
+            }
+            throw LLMError.invalidResponse
+        }
+    }
+    
     // MARK: - Mock/Preview Support
     
     static var mock: LLMService {
         let service = LLMService()
-        service.configure(apiKey: "mock_key")
+        service.configure(provider: .openAI, apiKey: "mock_key")
         return service
     }
 }
 
 // MARK: - Data Models
 
-struct Message: Codable {
+struct LLMMessage: Codable {
     let role: String
     let content: String
 }
 
-struct ChatCompletionRequest: Codable {
-    let model: String
-    let messages: [Message]
-    let temperature: Double
-    let maxTokens: Int
-}
-
+// OpenAI Compatible Response Models
 struct ChatCompletionResponse: Codable {
-    let id: String
     let choices: [Choice]
     
     struct Choice: Codable {
-        let message: Message
-        let finishReason: String
+        let message: LLMMessage
+        let finishReason: String?
     }
 }
+
+// Anthropic Response Model
+struct AnthropicResponse: Codable {
+    let content: [AnthropicContentBlock]
+    
+    struct AnthropicContentBlock: Codable {
+        let type: String
+        let text: String
+    }
+}
+
+// MARK: - Error Analysis
 
 struct ErrorAnalysis: Codable {
     let hasErrors: Bool
@@ -209,6 +333,7 @@ enum LLMError: LocalizedError {
     case invalidResponse
     case rateLimited
     case invalidAPIKey
+    case providerNotConfigured
     
     var errorDescription: String? {
         switch self {
@@ -222,6 +347,8 @@ enum LLMError: LocalizedError {
             return "Rate limited. Please try again later."
         case .invalidAPIKey:
             return "Invalid API key. Please check your settings."
+        case .providerNotConfigured:
+            return "The selected AI provider is not configured. Please add your API key."
         }
     }
 }

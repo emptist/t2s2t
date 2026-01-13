@@ -1,43 +1,53 @@
 # iOS Target Configuration Guide for T2S2T
 
-This guide provides step-by-step instructions for configuring the iOS target after opening the T2S2T project in Xcode.
+This guide provides step-by-step instructions for configuring the iOS target after generating the Xcode project.
 
-## **IMPORTANT CORRECTION: Folder to Open**
+## Quick Start
 
-The project has a multi-platform structure:
-```
-t2s2t/ (root folder)
-├── T2S2T/          # iOS app source code
-├── T2S2TMac/      # macOS app source code
-├── T2S2TWatch/    # watchOS app source code
-├── Shared/        # Shared code
-└── T2S2T.xcodeproj/ # Xcode project
-```
+1. **Generate the Xcode project**:
+   ```bash
+   cd /Users/jk/gits/hub/two_way_com_training/t2s2t
+   ./setup_xcode_project.sh
+   ```
 
-**You should open the ROOT `t2s2t` folder in Xcode**, not the `T2S2T` subfolder. This allows Xcode to manage all three platforms as a unified project.
+2. **Open the project in Xcode**:
+   ```bash
+   open T2S2T.xcodeproj
+   ```
+
+3. **Configure the iOS target** (steps below)
 
 ## Prerequisites
 
 - macOS with Xcode 15+
 - Apple Developer Account (for signing and capabilities)
 - Physical iOS device (optional but recommended for testing capabilities)
+- XcodeGen installed (handled by setup script)
+
+## Project Structure
+
+```
+t2s2t/ (root folder)
+├── project.yml              # XcodeGen configuration
+├── setup_xcode_project.sh   # Project generation script
+├── T2S2T.xcodeproj/         # Generated Xcode project
+├── T2S2T/                   # iOS app source
+│   ├── App/
+│   ├── Views/
+│   ├── Info.plist
+│   └── T2S2T.entitlements
+└── Shared/                  # Shared code
+    ├── Models/
+    ├── Services/
+    └── Utilities/
+```
 
 ## Step 1: Open Project in Xcode
 
 1. Launch Xcode
 2. Select "Open a project or file"
-3. Navigate to the **`t2s2t` root folder** (the one containing T2S2T, T2S2TMac, T2S2TWatch subfolders)
-4. Select `T2S2T.xcodeproj` or `T2S2T.xcworkspace` if they exist
-
-**If project file doesn't exist:** Create a new Xcode project:
-- File → New → Project
-- Select **"Multiplatform App"** template (to get iOS, macOS, watchOS targets)
-- Product Name: `T2S2T`
-- Interface: SwiftUI
-- Language: Swift
-- Use Core Data: ✅
-- Include Tests: ✅
-- Save in the **root `t2s2t` folder** (not the T2S2T subfolder)
+3. Navigate to the `t2s2t` root folder
+4. Select `T2S2T.xcodeproj`
 
 ## Step 2: Configure iOS Target Settings
 
@@ -57,23 +67,25 @@ t2s2t/ (root folder)
 
 1. Go to "Signing & Capabilities" tab
 2. Enable "Automatically manage signing"
-3. Add capabilities (click "+ Capability"):
+3. Click "+ Capability" and add:
 
-   ### Required Capabilities:
-   - **iCloud**:
-     - Enable CloudKit
-     - Container: `iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)`
-     - Services: CloudKit, Key-value storage
-   - **App Groups**:
-     - Add group: `group.$(PRODUCT_BUNDLE_IDENTIFIER)`
-   - **Background Modes**:
-     - Audio, AirPlay, and Picture in Picture
-     - Background fetch (optional)
-   - **Push Notifications** (optional)
+### Required Capabilities:
+- **iCloud**:
+  - Enable CloudKit
+  - Container: `iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)`
+  - Services: CloudKit, Key-value storage
+- **App Groups**:
+  - Add group: `group.$(PRODUCT_BUNDLE_IDENTIFIER)`
+- **Background Modes**:
+  - Audio, AirPlay, and Picture in Picture
+  - Background fetch (optional)
+- **Push Notifications** (optional)
 
-   ### Privacy Permissions (auto-added via Info.plist):
-   - Microphone Usage
-   - Speech Recognition Usage
+### Privacy Permissions (in Info.plist):
+- Microphone Usage
+- Speech Recognition Usage
+
+These are pre-configured in `T2S2T/Info.plist`.
 
 ## Step 4: Configure Info.plist
 
@@ -83,17 +95,11 @@ The project includes a pre-configured `Info.plist` in `T2S2T/Info.plist` with:
 - `NSSpeechRecognitionUsageDescription`: "T2S2T uses speech recognition to understand your language practice"
 - App Transport Security exceptions for OpenAI and Anthropic APIs
 
-Verify these entries are present in your target's Info.plist:
-1. Select the project
-2. Go to Build Settings
-3. Search for "Info.plist File"
-4. Ensure it points to `T2S2T/Info.plist`
-
 ## Step 5: Configure Build Settings
 
 Important build settings to verify:
 
-1. Search for "Swift Language Version" - set to Swift 6
+1. Search for "Swift Language Version" - set to Swift 5.9
 2. Search for "Enable Modules" - set to YES
 3. Search for "Always Embed Swift Standard Libraries" - set to YES
 4. For Core Data with CloudKit:
@@ -102,11 +108,11 @@ Important build settings to verify:
 
 ## Step 6: Add Frameworks
 
-Required frameworks:
+Required frameworks are automatically linked via XcodeGen, but verify:
 1. Select the target
 2. Go to "Build Phases"
 3. Expand "Link Binary With Libraries"
-4. Click "+" and add:
+4. Verify these are present:
    - `AVFoundation.framework`
    - `Speech.framework`
    - `CoreData.framework`
@@ -123,10 +129,10 @@ The project includes a Core Data model (`Shared/Models/T2S2T.xcdatamodeld/`) wit
 - **Conversation**: Recorded conversation sessions
 - **ProgressEntry**: Daily progress tracking
 
-To use the pre-existing model:
-1. Ensure the `Shared/Models/T2S2T.xcdatamodeld` file is referenced in Xcode
-2. It should be added to all targets (iOS, macOS, watchOS)
-3. Update `DataController.swift` if needed (already configured)
+To verify:
+1. Ensure `T2S2T.xcdatamodeld` is in the project navigator
+2. Check target membership includes T2S2T
+3. It's in "Copy Bundle Resources" build phase
 
 ## Step 8: Configure Scheme
 
@@ -137,8 +143,8 @@ To use the pre-existing model:
    - Enable "Allow GPU Frame Capture"
 4. Arguments tab:
    - Add environment variables:
-     - `API_KEY_OPENAI`: (your OpenAI API key)
-     - `API_KEY_ANTHROPIC`: (your Anthropic API key) - optional
+     - `OPENAI_API_KEY`: (your OpenAI API key)
+     - `ANTHROPIC_API_KEY`: (optional)
 5. Diagnostics tab:
    - Enable "Main Thread Checker"
    - Enable "Runtime API Checking"
@@ -182,24 +188,23 @@ For macOS and watchOS targets:
 
 ## Automated Scripts
 
-The project includes several helper scripts:
+The project includes helper scripts:
 
-- `T2S2T/setup_xcode_project.sh`: Interactive guide for Xcode configuration
-- `T2S2T/configure_capabilities.sh`: Detailed capabilities setup
+- `setup_xcode_project.sh`: Generates Xcode project with XcodeGen
 - `T2S2T/build_scripts/build.sh`: Build automation script
 
 Run from terminal:
 ```bash
 cd t2s2t  # Root folder
-chmod +x T2S2T/setup_xcode_project.sh
-./T2S2T/setup_xcode_project.sh
+./setup_xcode_project.sh  # Generate project
+./T2S2T/build_scripts/build.sh build  # Build project
 ```
 
 ## Next Steps
 
 After successful configuration:
 
-1. Set up API keys in Configuration.swift
+1. Set up API keys in environment or Configuration.swift
 2. Test speech recognition functionality
 3. Implement pedagogical feedback system
 4. Add progress tracking views
@@ -210,4 +215,5 @@ After successful configuration:
 For issues, refer to:
 - `XCODE_WORKSPACE_GUIDE.md` - Multi-platform workspace setup
 - `PROJECT_SUMMARY.md` - Project overview
+- `QUICK_START.md` - Quick setup guide
 - `README.md` - General project setup

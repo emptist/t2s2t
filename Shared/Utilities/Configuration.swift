@@ -3,15 +3,44 @@ import Foundation
 struct Configuration {
     // MARK: - API Keys
     // These should be stored securely in production
-    // For development, use environment variables or a separate config file
+    // For development, use environment variables or Keychain in production
     
     static var openAIAPIKey: String {
-        // Read from environment variable or Keychain in production
         ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
     }
     
     static var anthropicAPIKey: String {
         ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"] ?? ""
+    }
+    
+    // MARK: - QWen (Local/Alibaba) API Configuration
+    
+    static var qwenAPIKey: String {
+        ProcessInfo.processInfo.environment["QWEN_API_KEY"] ?? ""
+    }
+    
+    static var qwenBaseURL: String {
+        ProcessInfo.processInfo.environment["QWEN_BASE_URL"] ?? "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    }
+    
+    static var qwenModel: String {
+        ProcessInfo.processInfo.environment["QWEN_MODEL"] ?? "qwen-turbo"
+    }
+    
+    // MARK: - AI Provider Selection
+    
+    /// Currently selected AI provider
+    static var selectedAIProvider: AIProviderType {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: "selectedAIProvider"),
+                  let provider = AIProviderType(rawValue: rawValue) else {
+                return .openAI
+            }
+            return provider
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: "selectedAIProvider")
+        }
     }
     
     // MARK: - App Configuration
@@ -23,11 +52,9 @@ struct Configuration {
     // MARK: - Feature Flags
     
     static var isCloudSyncEnabled: Bool {
-        #if DEBUG
-        return false // Disable in debug to avoid accidental data sync
-        #else
-        return true
-        #endif
+        // iCloud sync requires Apple Developer Program with paid team
+        // Personal development teams do not support CloudKit
+        return false
     }
     
     static var isAnalyticsEnabled: Bool {
@@ -61,26 +88,24 @@ struct Configuration {
     
     static let defaultSpeechRate: Float = 0.5
     static let defaultSpeechPitch: Float = 1.0
-    static let silenceTimeout: TimeInterval = 10.0 // seconds
-    static let maxRecordingDuration: TimeInterval = 60.0 // seconds
+    static let silenceTimeout: TimeInterval = 10.0
+    static let maxRecordingDuration: TimeInterval = 60.0
     
     // MARK: - LLM Settings
     
-    static let defaultModel = "gpt-4-turbo-preview"
-    static let fallbackModel = "gpt-3.5-turbo"
     static let temperature: Double = 0.7
     static let maxTokens: Int = 500
     
     // MARK: - Sync Settings
     
-    static let syncInterval: TimeInterval = 300 // 5 minutes
+    static let syncInterval: TimeInterval = 300
     static let maxSyncRetries = 3
     static let syncConflictResolution = ConflictResolutionStrategy.newestWins
     
     // MARK: - Analytics
     
-    static let analyticsSampleRate: Double = 1.0 // 100%
-    static let sessionTimeout: TimeInterval = 1800 // 30 minutes
+    static let analyticsSampleRate: Double = 1.0
+    static let sessionTimeout: TimeInterval = 1800
     
     // MARK: - Security
     
@@ -106,9 +131,90 @@ enum AppEnvironment {
         #if DEBUG
         return .development
         #else
-        // You might want to use a configuration flag or scheme to determine this
         return .production
         #endif
+    }
+}
+
+/// AI Provider types supported by the application
+enum AIProviderType: String, CaseIterable, Identifiable {
+    case openAI = "openai"
+    case anthropic = "anthropic"
+    case qwen = "qwen"
+    
+    var id: String { rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .openAI:
+            return "OpenAI"
+        case .anthropic:
+            return "Anthropic"
+        case .qwen:
+            return "QWen (Alibaba)"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .openAI:
+            return "GPT-4 and GPT-3.5 models"
+        case .anthropic:
+            return "Claude models"
+        case .qwen:
+            return "QWen Turbo/Plus/Max models"
+        }
+    }
+    
+    var requiresAPIKey: Bool {
+        return true
+    }
+    
+    var defaultModel: String {
+        switch self {
+        case .openAI:
+            return "gpt-4-turbo-preview"
+        case .anthropic:
+            return "claude-3-opus-20240229"
+        case .qwen:
+            return "qwen-turbo"
+        }
+    }
+    
+    var apiKeyEnvironmentVariable: String {
+        switch self {
+        case .openAI:
+            return "OPENAI_API_KEY"
+        case .anthropic:
+            return "ANTHROPIC_API_KEY"
+        case .qwen:
+            return "QWEN_API_KEY"
+        }
+    }
+    
+    var baseURL: String {
+        switch self {
+        case .openAI:
+            return "https://api.openai.com/v1/chat/completions"
+        case .anthropic:
+            return "https://api.anthropic.com/v1/messages"
+        case .qwen:
+            // QWen compatible-mode endpoint
+            return Configuration.qwenBaseURL.isEmpty
+                ? "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+                : Configuration.qwenBaseURL + "/chat/completions"
+        }
+    }
+    
+    var supportsStreaming: Bool {
+        switch self {
+        case .openAI:
+            return true
+        case .anthropic:
+            return true
+        case .qwen:
+            return true
+        }
     }
 }
 
