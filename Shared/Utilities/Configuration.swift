@@ -3,28 +3,63 @@ import Foundation
 struct Configuration {
     // MARK: - API Keys
     // These should be stored securely in production
-    // For development, use environment variables or Keychain in production
+    // For development, use environment variables, .env file, or Keychain in production
+    
+    private static var userDefaultsAPIKeys: [String: String] {
+        get {
+            UserDefaults.standard.dictionary(forKey: "apiKeys") as? [String: String] ?? [:]
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "apiKeys")
+        }
+    }
     
     static var openAIAPIKey: String {
-        ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
+        userDefaultsAPIKeys["OPENAI_API_KEY"]
+            ?? ProcessInfo.processInfo.environment["OPENAI_API_KEY"]
+            ?? ""
     }
     
     static var anthropicAPIKey: String {
-        ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"] ?? ""
+        userDefaultsAPIKeys["ANTHROPIC_API_KEY"]
+            ?? ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"]
+            ?? ""
     }
     
     // MARK: - QWen (Local/Alibaba) API Configuration
     
     static var qwenAPIKey: String {
-        ProcessInfo.processInfo.environment["QWEN_API_KEY"] ?? ""
+        userDefaultsAPIKeys["QWEN_API_KEY"]
+            ?? ProcessInfo.processInfo.environment["QWEN_API_KEY"]
+            ?? ""
     }
     
     static var qwenBaseURL: String {
-        ProcessInfo.processInfo.environment["QWEN_BASE_URL"] ?? "https://dashscope.aliyuncs.com/compatible-mode/v1"
+        UserDefaults.standard.string(forKey: "QWEN_BASE_URL")
+            ?? ProcessInfo.processInfo.environment["QWEN_BASE_URL"]
+            ?? "https://dashscope.aliyuncs.com/compatible-mode/v1"
     }
     
     static var qwenModel: String {
-        ProcessInfo.processInfo.environment["QWEN_MODEL"] ?? "qwen-turbo"
+        UserDefaults.standard.string(forKey: "QWEN_MODEL")
+            ?? ProcessInfo.processInfo.environment["QWEN_MODEL"]
+            ?? "qwen-turbo"
+    }
+    
+    // MARK: - API Key Storage
+    
+    /// Save API key to UserDefaults for the given provider
+    static func saveAPIKey(_ key: String, for provider: AIProviderType) {
+        var keys = userDefaultsAPIKeys
+        keys[provider.apiKeyEnvironmentVariable] = key
+        userDefaultsAPIKeys = keys
+    }
+    
+    /// Clear all stored API keys
+    static func clearAPIKeys() {
+        userDefaultsAPIKeys = [:]
+        UserDefaults.standard.removeObject(forKey: "QWEN_BASE_URL")
+        UserDefaults.standard.removeObject(forKey: "QWEN_MODEL")
     }
     
     // MARK: - AI Provider Selection
@@ -34,7 +69,8 @@ struct Configuration {
         get {
             guard let rawValue = UserDefaults.standard.string(forKey: "selectedAIProvider"),
                   let provider = AIProviderType(rawValue: rawValue) else {
-                return .openAI
+                // Default to QWen for better compatibility
+                return .qwen
             }
             return provider
         }

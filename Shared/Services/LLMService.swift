@@ -14,8 +14,21 @@ class LLMService: ObservableObject {
     @Published var error: Error?
     @Published var isConfigured = false
     
-    init(urlSession: URLSession = .shared) {
-        self.urlSession = urlSession
+    init(urlSession: URLSession? = nil) {
+        // Create a custom session configuration to handle proxy/TLS issues
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
+        config.waitsForConnectivity = false
+        config.urlCache = nil
+        
+        // Use system proxy settings but be more lenient with TLS
+        if let session = urlSession {
+            self.urlSession = session
+        } else {
+            self.urlSession = URLSession(configuration: config)
+        }
+        
         self.jsonDecoder = JSONDecoder()
         self.jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
         self.jsonEncoder = JSONEncoder()
@@ -181,14 +194,21 @@ class LLMService: ObservableObject {
                 self?.isLoading = false
                 
                 if let error = error {
+                    print("LLMService: Network error: \(error.localizedDescription)")
                     self?.error = error
                     completion(.failure(error))
                     return
                 }
                 
                 guard let data = data else {
+                    print("LLMService: No data received")
                     completion(.failure(LLMError.noData))
                     return
+                }
+                
+                // Log response for debugging
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("LLMService: Response: \(responseString.prefix(500))")
                 }
                 
                 do {
@@ -196,9 +216,11 @@ class LLMService: ObservableObject {
                     if let content = content {
                         completion(.success(content))
                     } else {
+                        print("LLMService: Failed to parse content from response")
                         completion(.failure(LLMError.invalidResponse))
                     }
                 } catch {
+                    print("LLMService: Parse error: \(error.localizedDescription)")
                     self?.error = error
                     completion(.failure(error))
                 }
@@ -248,11 +270,22 @@ class LLMService: ObservableObject {
     }
     
     private func parseResponse(data: Data) throws -> String {
+        // First, try to decode as an error response
+        if let errorResponse = try? jsonDecoder.decode(APIErrorResponse.self, from: data),
+           !errorResponse.error.message.isEmpty {
+            throw LLMError.apiError(errorResponse.error.message)
+        }
+        
         switch currentProvider {
         case .openAI, .qwen:
             let response = try jsonDecoder.decode(ChatCompletionResponse.self, from: data)
             if let content = response.choices.first?.message.content {
                 return content
+            }
+            // Check for finish reason
+            if let firstChoice = response.choices.first,
+               firstChoice.finishReason == "length" {
+                throw LLMError.responseTruncated
             }
             throw LLMError.invalidResponse
             
@@ -325,6 +358,16 @@ struct LanguageError: Codable {
     }
 }
 
+// MARK: - API Error Response
+
+struct APIErrorResponse: Codable {
+    let error: APIError
+    struct APIError: Codable {
+        let message: String
+        let type: String?
+    }
+}
+
 // MARK: - Errors
 
 enum LLMError: LocalizedError {
@@ -334,6 +377,8 @@ enum LLMError: LocalizedError {
     case rateLimited
     case invalidAPIKey
     case providerNotConfigured
+    case apiError(String)
+    case responseTruncated
     
     var errorDescription: String? {
         switch self {
@@ -349,6 +394,10 @@ enum LLMError: LocalizedError {
             return "Invalid API key. Please check your settings."
         case .providerNotConfigured:
             return "The selected AI provider is not configured. Please add your API key."
+        case .apiError(let message):
+            return "API Error: \(message)"
+        case .responseTruncated:
+            return "Response was truncated due to length limit."
         }
     }
 }

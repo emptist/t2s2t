@@ -3,7 +3,7 @@ options:
   bundleIdPrefix: com.t2s2t
   deploymentTarget:
     iOS: "18.0"
-    macOS: "26.0"
+    macOS: "14.0"
     watchOS: "11.0"
   xcodeVersion: "15.0"
   generateEmptyDirectories: true
@@ -56,6 +56,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.t2s2t.app.mac
         COMBINE_HIDPI_IMAGES: true
         INFOPLIST_FILE: T2S2TMac/Info.plist
+        CODE_SIGN_ENTITLEMENTS: T2S2TMac/T2S2TMac.entitlements
         LD_RUNPATH_SEARCH_PATHS:
           - $(inherited)
           - "@executable_path/../Frameworks"
@@ -64,6 +65,7 @@ targets:
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.device.audio-input: true
+        com.apple.security.network.client: true
 
   T2S2TWatch:
     type: application

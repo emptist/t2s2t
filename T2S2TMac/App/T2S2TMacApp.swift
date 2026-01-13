@@ -86,8 +86,10 @@ struct PracticeView: View {
     @State private var userInput = ""
     @State private var conversation: [ChatMessage] = []
     @State private var isRecording = false
+    @State private var isConversationMode = false  // Continuous conversation mode
     @State private var currentLanguage = "English"
     @State private var isProcessing = false
+    @State private var autoSpeak = true
     
     var body: some View {
         HStack(spacing: 0) {
@@ -171,27 +173,90 @@ struct PracticeView: View {
                 Divider()
                 
                 // Input Area
-                HStack(spacing: 12) {
-                    Button(action: toggleRecording) {
-                        Image(systemName: isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                            .font(.title)
-                            .foregroundColor(isRecording ? .red : .blue)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    TextField("Type or speak...", text: $userInput)
-                        .textFieldStyle(.plain)
-                        .disabled(isRecording || isProcessing)
-                        .onSubmit {
-                            sendMessage()
+                VStack(spacing: 8) {
+                    // Main input row with button and text field
+                    HStack(spacing: 12) {
+                        // Speak / Stop button - controls conversation mode
+                        Button(action: toggleConversation) {
+                            HStack(spacing: 6) {
+                                Image(systemName: isConversationMode ? "stop.circle.fill" : "mic.circle.fill")
+                                    .font(.title2)
+                                Text(isConversationMode ? "Stop" : "Speak")
+                                    .font(.headline)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(isConversationMode ? Color.red : Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(25)
                         }
-                    
-                    Button(action: sendMessage) {
-                        Image(systemName: "paperplane.fill")
-                            .foregroundColor(.blue)
+                        .buttonStyle(.plain)
+                        .help(isConversationMode ? "Stop conversation" : "Start speaking")
+                        
+                        // Text input field for typing - ONLY show when NOT recording
+                        if !isConversationMode {
+                            TextField("Type your message...", text: $userInput)
+                                .textFieldStyle(.plain)
+                                .padding(10)
+                                .background(Color(NSColor.textBackgroundColor))
+                                .cornerRadius(8)
+                                .disabled(isProcessing)
+                            
+                            // Send button for typed input
+                            Button(action: sendMessage) {
+                                Image(systemName: "paperplane.fill")
+                                    .font(.title3)
+                                    .foregroundColor(userInput.isEmpty ? .gray : .blue)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(userInput.isEmpty || isProcessing)
+                        }
+                        
+                        Spacer()
+                        
+                        // Auto Speak toggle (for TTS responses) - only show when not recording
+                        if !isConversationMode {
+                            Toggle("Auto Speak", isOn: $autoSpeak)
+                                .font(.caption)
+                                .toggleStyle(.switch)
+                                .controlSize(.small)
+                                .disabled(isProcessing)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(userInput.isEmpty || isProcessing)
+                    
+                    // Status and audio level display
+                    HStack(spacing: 8) {
+                        // Recording indicator
+                        if isConversationMode {
+                            Circle()
+                                .fill(speechService.isRecording ? Color.green : Color.orange)
+                                .frame(width: 8, height: 8)
+                            Text(speechService.debugStatus)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Tap 'Speak' or type to start")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        // Audio level visualization (when recording)
+                        if isConversationMode {
+                            AudioLevelView(level: speechService.audioLevel)
+                                .frame(width: 60, height: 16)
+                        }
+                        
+                        // Show recognized text while recording
+                        if isConversationMode && !speechService.recognizedText.isEmpty {
+                            Text("• \(speechService.recognizedText)")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                        
+                        Spacer()
+                    }
                 }
                 .padding()
                 .background(Color(NSColor.controlBackgroundColor))
@@ -213,12 +278,42 @@ struct PracticeView: View {
                     userInput = ""
                 }
                 
+                // Auto-speak toggle
+                Toggle("Auto Speak", isOn: $autoSpeak)
+                    .font(.caption)
+                    .toggleStyle(.switch)
+                    .controlSize(.small)
+                
                 Spacer()
                 
                 // Status
                 VStack(alignment: .leading, spacing: 4) {
-                    StatusIndicator(label: "Speech", status: speechService.isAuthorized ? .ready : .pending)
+                    StatusIndicator(label: "Speech", status: speechService.speechAuthorized ? .ready : .pending)
+                    if !speechService.speechAuthorized && speechService.errorMessage != nil {
+                        Text("Tap mic to enable")
+                            .font(.caption2)
+                            .foregroundColor(.orange)
+                    }
                     StatusIndicator(label: "AI", status: llmService.isConfigured ? .ready : .pending)
+                    if llmService.isConfigured {
+                        Text(Configuration.selectedAIProvider.displayName)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    // Debug status
+                    Text(speechService.debugStatus)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.leading)
+                    
+                    // Error message
+                    if let error = speechService.errorMessage {
+                        Text(error)
+                            .font(.caption2)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
             }
             .frame(width: 160)
@@ -227,51 +322,185 @@ struct PracticeView: View {
         }
     }
     
-    private func toggleRecording() {
-        guard speechService.isAuthorized else {
+    // MARK: - Conversation Mode
+    
+    private func toggleConversation() {
+        guard speechService.speechAuthorized else {
             // Request authorization if not granted
             speechService.requestAuthorization()
             return
         }
         
-        if isRecording {
-            speechService.stopRecording()
-            isRecording = false
+        if isConversationMode {
+            // Stop the conversation
+            stopConversation()
         } else {
-            Task { @MainActor in
-                do {
-                    try speechService.startRecording(languageCode: languageCode(currentLanguage))
-                    isRecording = true
-                } catch {
-                    print("Failed to start recording: \(error)")
-                    isRecording = false
+            // Start a new conversation
+            startConversation()
+        }
+    }
+    
+    private func startConversation() {
+        print("[UI] Starting conversation mode")
+        isConversationMode = true
+        
+        // Clear previous state
+        speechService.recognizedText = ""
+        userInput = ""
+        
+        // Set up silence detection callback
+        speechService.onSilenceDetected = { [self] in
+            guard isConversationMode else { return }
+            print("[UI] Silence detected, stopping recording and sending to AI...")
+            
+            // Stop recording but keep conversation mode active
+            let finalText = speechService.recognizedText
+            speechService.stopRecording()
+            
+            // Send to AI if we have text
+            if !finalText.isEmpty {
+                sendToAI(text: finalText)
+            } else {
+                // No text recognized, restart listening
+                DispatchQueue.main.async {
+                    startListening()
+                }
+            }
+        }
+        
+        // Start listening - will auto-stop after 2.5s silence
+        startListening()
+    }
+    
+    private func stopConversation() {
+        print("[UI] Stopping conversation mode")
+        isConversationMode = false
+        
+        // Disable streaming
+        speechService.isAutoMode = false
+        speechService.disableStreaming()
+        speechService.stopRecording()
+        speechService.stopSpeaking()
+    }
+    
+    private func startListening() {
+        guard isConversationMode else { return }
+        
+        Task { @MainActor in
+            do {
+                print("[UI] Starting to listen...")
+                speechService.recognizedText = ""
+                try speechService.startRecording(languageCode: languageCode(currentLanguage))
+            } catch {
+                print("[UI] Failed to start listening: \(error)")
+                // Show user-friendly error in conversation
+                let errorMessage = getUserFriendlyErrorMessage(for: error)
+                conversation.append(ChatMessage(id: UUID(), role: .assistant, content: errorMessage))
+                // Try to restart after a short delay (only if still in conversation mode)
+                if isConversationMode {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        self.startListening()
+                    }
                 }
             }
         }
     }
     
-    private func sendMessage() {
-        guard !userInput.isEmpty else { return }
+    private func getUserFriendlyErrorMessage(for error: Error) -> String {
+        // Check for specific speech recognition errors
+        if let speechError = error as? SpeechService.SpeechError {
+            return speechError.errorDescription ?? "Speech recognition error occurred"
+        }
         
-        let input = userInput
-        userInput = ""
+        // Check for common network/permission issues
+        let errorCode = (error as NSError).code
+        let domain = (error as NSError).domain
+        
+        print("[UI] Error details - domain: \(domain), code: \(errorCode)")
+        
+        // Permission-related errors
+        if errorCode == 1 || errorCode == 168 || domain == "com.apple.speech.recognition" {
+            return "Permission denied. Please grant microphone and speech recognition permissions in System Preferences > Privacy & Security."
+        }
+        
+        // Microphone in use by another app
+        if errorCode == -50 || errorCode == 561015949 || error.localizedDescription.contains("in use") {
+            return "Microphone is in use by another application. Please close other apps using the microphone and try again."
+        }
+        
+        // Network errors for speech recognition
+        if errorCode == -1009 || errorCode == -1004 {
+            return "Network unavailable. Speech recognition requires an internet connection. Please check your network settings."
+        }
+        
+        // If we have a meaningful description, use it (check for unhelpful OSStatus errors)
+        let description = error.localizedDescription
+        if !description.isEmpty, description != "The operation couldn't be completed. (OSStatus error -50.)" {
+            return "Error: \(description)"
+        }
+        
+        // Fallback to a helpful message
+        return "Unable to start listening. Please check your microphone connection and permissions, then try again."
+    }
+    
+    private func sendToAI(text: String) {
+        guard !text.isEmpty else { return }
+        
         isProcessing = true
         
-        // Add user message
-        conversation.append(ChatMessage(id: UUID(), role: .user, content: input))
+        // Add user message to conversation
+        conversation.append(ChatMessage(id: UUID(), role: .user, content: text))
         
         // Get AI response
-        llmService.generateResponse(userInput: input, language: currentLanguage) { result in
+        llmService.generateResponse(userInput: text, language: currentLanguage) { result in
             DispatchQueue.main.async {
-                isProcessing = false
+                self.isProcessing = false
+                
                 switch result {
                 case .success(let response):
-                    conversation.append(ChatMessage(id: UUID(), role: .assistant, content: response))
+                    // Add AI response to conversation
+                    self.conversation.append(ChatMessage(id: UUID(), role: .assistant, content: response))
+                    
+                    // Speak the response if auto-speak is enabled
+                    if self.autoSpeak {
+                        self.speechService.speak(text: response, languageCode: self.languageCode(self.currentLanguage))
+                        
+                        // After TTS finishes, start listening again
+                        self.speechService.onSpeechCompletion = {
+                            DispatchQueue.main.async {
+                                print("[UI] TTS finished, resuming listening...")
+                                self.startListening()
+                            }
+                        }
+                    } else {
+                        // Start listening again immediately if no TTS
+                        DispatchQueue.main.async {
+                            self.startListening()
+                        }
+                    }
+                    
                 case .failure(let error):
-                    conversation.append(ChatMessage(id: UUID(), role: .assistant, content: "Sorry, I couldn't respond. Error: \(error.localizedDescription)"))
+                    self.conversation.append(ChatMessage(id: UUID(), role: .assistant, content: "Sorry, I couldn't respond. Error: \(error.localizedDescription)"))
+                    // Try to continue the conversation
+                    self.startListening()
                 }
             }
         }
+    }
+    
+    // MARK: - Sync recognized text to user input
+    
+    private func syncRecognizedText() {
+        // Sync from speech service recognized text to user input
+        if !speechService.recognizedText.isEmpty && speechService.recognizedText != userInput {
+            userInput = speechService.recognizedText
+        }
+    }
+    
+    private func sendMessage() {
+        guard !userInput.isEmpty else { return }
+        sendToAI(text: userInput)
+        userInput = ""
     }
     
     private func languageCode(_ language: String) -> String {
@@ -309,6 +538,25 @@ struct MessageBubble: View {
         }
         .padding(.horizontal)
         .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
+    }
+}
+
+struct AudioLevelView: View {
+    let level: Float
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                // Background
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                
+                // Level indicator
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(level > 0.01 ? Color.green : Color.clear)
+                    .frame(width: max(0, CGFloat(level) * geometry.size.width))
+            }
+        }
     }
 }
 
@@ -527,13 +775,8 @@ struct SettingsView: View {
                                     Spacer()
                                     
                                     if provider == selectedProvider {
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(.blue)
-                                    }
-                                    
-                                    if llmService.isProviderConfigured(provider) {
                                         Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
+                                            .foregroundColor(.blue)
                                     }
                                 }
                             }
@@ -596,7 +839,7 @@ struct SettingsView: View {
                     saveConfiguration()
                     dismiss()
                 }
-                .disabled(apiKey.isEmpty && selectedProvider != .qwen)
+                .disabled(!isValidAPIKey)
                 .keyboardShortcut(.defaultAction)
             }
             .padding()
@@ -613,6 +856,14 @@ struct SettingsView: View {
         case .qwen:
             return Configuration.qwenAPIKey
         }
+    }
+    
+    private var isValidAPIKey: Bool {
+        // QWen doesn't require API key for some endpoints
+        if selectedProvider == .qwen {
+            return true // Allow saving without key for QWen
+        }
+        return !apiKey.isEmpty
     }
     
     private func testConnection() {
@@ -634,10 +885,11 @@ struct SettingsView: View {
     }
     
     private func saveConfiguration() {
-        let envKey = selectedProvider.apiKeyEnvironmentVariable
-        setenv(envKey, apiKey, 1)
+        // Save API key to UserDefaults for persistence across app launches
+        Configuration.saveAPIKey(apiKey, for: selectedProvider)
         
         if selectedProvider == .qwen {
+            UserDefaults.standard.set(qwenModel, forKey: "QWEN_MODEL")
             UserDefaults.standard.set(qwenModel, forKey: "QWEN_MODEL")
         }
         
